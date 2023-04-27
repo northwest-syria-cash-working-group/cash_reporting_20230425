@@ -14,9 +14,13 @@ cbr <- read_csv(""./data/cbr_com.csv"") %>%
          # Doing this because Ar-Raqqa has never appeared before
          previously_assisted = ifelse(admin1pcode %in% c(""SY11""), 
                                       ""No"", 
+                                      previously_assisted), 
+         # Just this one time, since they haven't appeared before
+         previously_assisted = ifelse(implementing_partner == ""CBRTWG-033"", 
+                                      ""No"", 
                                       previously_assisted))
 "
-"2","[1mRows: [22m[34m3067[39m [1mColumns: [22m[34m28[39m"
+"2","[1mRows: [22m[34m3086[39m [1mColumns: [22m[34m28[39m"
 "2","[36m--[39m [1mColumn specification[22m [36m-----------------------------------------------------------------------------[39m
 [1mDelimiter:[22m "",""
 [31mchr[39m  (20): implementing_partner, abbreviation, donor, project_status, currency, governorate, dist...

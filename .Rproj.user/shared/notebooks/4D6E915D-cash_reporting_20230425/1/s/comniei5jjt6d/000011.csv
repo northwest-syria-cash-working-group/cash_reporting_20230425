@@ -1,0 +1,62 @@
+"0","cbr %>% 
+  filter(project_status == ""Completed"" & 
+           str_detect(cluster, ""Multipurpose"") & 
+           previously_assisted == ""No"") %>% 
+  group_by(governorate, district) %>% 
+  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE)) %>% 
+  mutate(district = fct_reorder(district, beneficiaries),
+         governorate = fct_relevel(governorate, 
+                                   c(""Idleb"", ""Ar-Raqqa"", ""Aleppo""))
+         ) %>% 
+  ggplot(aes(x = beneficiaries, y = district)) + 
+  geom_col(aes(fill = governorate)) + 
+  geom_text(aes(label = comma(beneficiaries)), 
+            hjust = ""inward"") + 
+  scale_fill_viridis_d(begin = .3) + 
+  labs(title = ""MPC beneficiaries by district"", 
+       subtitle = paste0(""as of "", report_date), 
+       y = """") + 
+  scale_x_continuous(labels = unit_format(unit = ""K"", scale = 1e-3, accuracy = 1)) + 
+
+hno %>% 
+  filter(admin2name_en %in% c(""Harim"", ""Idleb"", ""Jisr-Ash-Shugur"", ""Ariha"", 
+                              ""Tell Abiad"",  
+                              ""Afrin"", ""Jebel Saman"", ""A'zaz"", ""Jarablus"", ""Al Bab"")) %>% 
+  group_by(governorate = admin1name_en, district = admin2name_en) %>% 
+  summarise(total_population = sum(total_population, na.rm = TRUE), 
+            .groups = ""drop"") %>% 
+  left_join(
+    cbr %>%
+      filter(project_status == ""Completed"" & 
+           str_detect(cluster, ""Multipurpose"") & 
+           previously_assisted == ""No"") %>%  
+      group_by(district) %>% 
+      summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE)) ,  
+  by = ""district"") %>% 
+  # Kind of irritating that you're doing this manually 
+  mutate(district = fct_relevel(district, 
+                                ""Al Bab"", 
+                                ""Jarablus"", 
+                                ""A'zaz"", 
+                                ""Jebel Saman"", 
+                                ""Afrin"", 
+                                ""Tell Abiad"", 
+                                ""Ariha"", 
+                                ""Jisr-Ash-Shugur"", 
+                                ""Idleb"", 
+                                ""Harim""),
+         pc_reached = round(beneficiaries / total_population * 100, digits = 1)) %>% 
+  ggplot(aes(x = pc_reached, y = district)) +
+  geom_col(aes(fill = governorate)) + 
+  geom_text(aes(label = comma(pc_reached)), 
+            hjust = ""inward"") +
+  scale_fill_viridis_d(begin = .3) + 
+  labs(title = ""Percent of population reached"", 
+       subtitle = paste0(""as of "", report_date), 
+       y = """", 
+       x = ""% of population reached"") +
+  
+  plot_layout(guides = ""collect"") & 
+  theme(legend.position = ""bottom"")
+"
+"2","`summarise()` has grouped output by 'governorate'. You can override using the `.groups` argument."
