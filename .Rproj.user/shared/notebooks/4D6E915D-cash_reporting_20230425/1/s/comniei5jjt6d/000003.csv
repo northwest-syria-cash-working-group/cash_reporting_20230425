@@ -1,0 +1,69 @@
+"0","cbr %>% 
+  filter(project_status == ""Completed"" & 
+           str_detect(cluster, ""Multipurpose"") & 
+           previously_assisted == ""No"") %>% 
+  group_by(governorate, district) %>% 
+  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE)) %>% 
+  mutate(district = fct_reorder(district, beneficiaries),
+         governorate = fct_relevel(governorate, 
+                                   c(""Idleb"", ""Aleppo""))
+         ) %>% 
+  ggplot(aes(x = beneficiaries, y = district)) + 
+  geom_col(aes(fill = governorate)) + 
+  geom_text(aes(label = comma(beneficiaries)), 
+            hjust = ""inward"") + 
+  scale_fill_viridis_d(begin = .3) + 
+  labs(title = ""MPC beneficiaries by district"", 
+       subtitle = ""as of 11 April 2023"", 
+       y = """") + 
+  scale_x_continuous(labels = comma) + 
+
+hno %>% 
+  filter(admin2name_en %in% c(""Harim"", ""Idleb"", ""Jisr-Ash-Shugur"", ""Ariha"", 
+                              # ""Tell Abiad"",  
+                              ""Afrin"", ""Jebel Saman"", ""A'zaz"", ""Jarablus"", ""Al Bab"")) %>% 
+  group_by(governorate = admin1name_en, district = admin2name_en) %>% 
+  summarise(total_population = sum(total_population, na.rm = TRUE), 
+            .groups = ""drop"") %>% 
+  left_join(
+    cbr %>%
+      filter(project_status == ""Completed"" & 
+           str_detect(cluster, ""Multipurpose"") & 
+           previously_assisted == ""No"") %>%  
+      group_by(district) %>% 
+      summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE)) ,  
+  by = ""district"") %>% 
+  # Kind of irritating that you're doing this manually 
+  mutate(district = fct_relevel(district, 
+                                ""Al Bab"", 
+                                ""Jarablus"", 
+                                ""A'zaz"", 
+                                ""Jebel Saman"", 
+                                ""Afrin"", 
+                                # ""Tell Abiad"", 
+                                ""Ariha"", 
+                                ""Jisr-Ash-Shugur"", 
+                                ""Idleb"", 
+                                ""Harim""),
+         pc_reached = round(beneficiaries / total_population * 100, digits = 1)) %>% 
+  ggplot(aes(x = pc_reached, y = district)) +
+  geom_col(aes(fill = governorate)) + 
+  geom_text(aes(label = comma(pc_reached)), 
+            hjust = ""inward"") +
+  scale_fill_viridis_d(begin = .3) + 
+  labs(title = ""Percent of population reached"", 
+       subtitle = paste0(""as of "", report_date), 
+       y = """", 
+       x = ""% of population reached"") +
+  
+  plot_layout(guides = ""collect"") & 
+  theme(legend.position = ""bottom"")
+"
+"2","`summarise()` has grouped output by 'governorate'. You can override using the `.groups` argument."
+"2","Warning: [38;5;238mThere were 2 warnings in `mutate()`.
+The first warning was:[39m
+[38;5;238m[36mi[38;5;238m In argument: `governorate = fct_relevel(governorate, c(""Idleb"", ""Aleppo""))`.
+[36mi[38;5;238m In group 1: `governorate = ""Aleppo""`.[39m
+Caused by warning:
+[33m![39m [38;5;238m1 unknown level in `f`: Idleb[39m
+[38;5;238m[36mi[38;5;238m Run ]8;;ide:run:dplyr::last_dplyr_warnings()dplyr::last_dplyr_warnings()]8;; to see the 1 remaining warning.[39m"

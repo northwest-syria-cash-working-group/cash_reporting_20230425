@@ -1,0 +1,27 @@
+"0","# Think of another way to do this -- if someone else runs this, it won't work 
+cbr <- read_csv(""./data/cbr_com.csv"") %>% 
+  mutate(month = month(distribution_date)) %>% 
+  replace_na(list(beneficiaries = 0)) %>% 
+  mutate(governorate = recode(governorate, 
+                              ""aleppo"" = ""Aleppo""), 
+         district = recode(district, 
+                           ""Jabal Samman"" = ""Jebel Saman"", 
+                           ""azaz"" = ""A'zaz"", 
+                           ""jarablus"" = ""Jarablus""), 
+         sub_district = recode(sub_district, 
+                               ""azaz"" = ""A'zaz"", 
+                           ""jarablus"" = ""Jarablus""), 
+         # Doing this because Ar-Raqqa has never appeared before
+         previously_assisted = ifelse(admin1pcode %in% c(""SY11""), 
+                                      ""No"", 
+                                      previously_assisted))
+"
+"2","[1mRows: [22m[34m3067[39m [1mColumns: [22m[34m28[39m"
+"2","[36m--[39m [1mColumn specification[22m [36m-----------------------------------------------------------------------------[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (20): implementing_partner, abbreviation, donor, project_status, currency, governorate, dist...
+[32mdbl[39m   (7): transfer_value, transfer_frequency, families, beneficiaries, longitude_x, latitude_y, ...
+[34mdttm[39m  (1): distribution_date"
+"2","
+[36mi[39m Use `spec()` to retrieve the full column specification for this data.
+[36mi[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
